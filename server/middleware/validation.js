@@ -9,8 +9,8 @@ exports.validateTeam = [
     .withMessage('Team name must be at least 3 characters long'),
   
   body('members')
-    .isArray({ min: 3, max: 4 })
-    .withMessage('Team must have between 3 and 4 members'),
+    .isArray({ min: 1, max: 2 })
+    .withMessage('Team must have between 1 and 2 members'),
   
   body('members.*.fullName')
     .trim()

@@ -1,21 +1,11 @@
-const express = require('express');
-const {
-  createTeam,
-  getTeams,
-  getTeam,
-  getTeamSummaries
-} = require('../controllers/teamController');
-const { validateTeam } = require('../middleware/validation');
+const express = require("express");
+const { createTeam } = require("../controllers/teamController");
+const { validateTeam } = require("../middleware/validation");
 
 const router = express.Router();
 
-router.route('/')
-  .post(createTeam)
-  .get(getTeams);
-
-  router.route('/summary').get(getTeamSummaries);
-router.route('/:id')
-  .get(getTeam);
-
+// The router now only defines one endpoint for creating a team.
+// The GET routes have been removed as they no longer exist in the controller.
+router.route("/").post(validateTeam, createTeam);
 
 module.exports = router;

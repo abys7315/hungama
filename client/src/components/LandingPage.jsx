@@ -88,8 +88,8 @@ const LandingPage = () => {
           </div>
         )}
 
-        {/* Theme Toggle */}
-        <div className="fixed top-6 right-6 z-50">
+        {/* Theme Toggle - MOVED TO BOTTOM RIGHT */}
+        <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={() => setIsDark(!isDark)}
             className="group relative w-16 h-16 rounded-full bg-gradient-to-r from-green-400 to-green-500 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
@@ -121,7 +121,7 @@ const LandingPage = () => {
                       : "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700"
                   } bg-clip-text text-transparent drop-shadow-2xl`}
                 >
-                  ANDROID CLUB
+                  MILESTONE CLUB
                 </span>
                 <div className="text-4xl md:text-6xl mt-2">
                   <span className="bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
@@ -138,8 +138,9 @@ const LandingPage = () => {
               className={`text-lg md:text-xl ${themeClasses.textMuted} mb-12 max-w-2xl mx-auto leading-relaxed animate-slide-up`}
               style={{ animationDelay: "0.2s" }}
             >
-              Empowering the next generation of mobile developers through
-              innovation, collaboration, and cutting-edge technology
+              Since 2023, Milestone Club has been dedicated to professional
+              growth and resume building through impactful, hands-on project
+              teams. We engage, improve, and guide.
             </p>
 
             {/* Enhanced CTA Buttons */}
@@ -154,15 +155,6 @@ const LandingPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                 <span className="relative z-10">Register for the Event</span>
               </Link>
-
-              <a
-                href="https://d2ec9l5n40oyrl.cloudfront.net/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative px-8 py-4 border-2 border-green-400 text-green-400 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-green-400 hover:text-gray-900 hover:scale-105 hover:shadow-lg hover:shadow-green-400/30 min-w-48 backdrop-blur-sm"
-              >
-                <span className="relative z-10">Join Our Club</span>
-              </a>
             </div>
           </div>
 

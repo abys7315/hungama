@@ -12,12 +12,11 @@ import {
 } from "lucide-react";
 
 const RegistrationForm = () => {
-  // State is initialized with the minimum of 2 members
+  // State is initialized with the minimum of 1 member
   const [teamData, setTeamData] = useState({
     teamName: "",
     members: [
       { fullName: "", email: "", mobile: "", regNo: "", isLeader: true },
-      { fullName: "", email: "", mobile: "", regNo: "", isLeader: false },
     ],
   });
   const [loading, setLoading] = useState(false);
@@ -42,7 +41,7 @@ const RegistrationForm = () => {
   };
 
   const addMember = () => {
-    if (teamData.members.length < 4) {
+    if (teamData.members.length < 2) {
       setTeamData((prev) => ({
         ...prev,
         members: [
@@ -54,8 +53,8 @@ const RegistrationForm = () => {
   };
 
   const removeMember = (index) => {
-    // Allows removal only if the team size is greater than 2
-    if (teamData.members.length > 2 && !teamData.members[index].isLeader) {
+    // Allows removal only if the team size is greater than 1 and it's not the leader
+    if (teamData.members.length > 1 && !teamData.members[index].isLeader) {
       setTeamData((prev) => ({
         ...prev,
         members: prev.members.filter((_, i) => i !== index),
@@ -70,9 +69,8 @@ const RegistrationForm = () => {
       return false;
     }
 
-    // Client-side validation for minimum team size
-    if (teamData.members.length < 2) {
-      setError("A team must have at least 2 members.");
+    if (teamData.members.length < 1) {
+      setError("A team must have at least 1 member.");
       return false;
     }
 
@@ -114,7 +112,7 @@ const RegistrationForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("https://september-freshers-mztb.onrender.com/api/teams", {
+      const response = await fetch("http://localhost:5000/api/teams", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -136,12 +134,11 @@ const RegistrationForm = () => {
           }, 1500); // Redirect after 1.5 seconds
       }
 
-      // Reset form to the initial state with 2 members
+      // Reset form to the initial state
       setTeamData({
         teamName: "",
         members: [
           { fullName: "", email: "", mobile: "", regNo: "", isLeader: true },
-          { fullName: "", email: "", mobile: "", regNo: "", isLeader: false },
         ],
       });
     } catch (err) {
@@ -197,7 +194,8 @@ const RegistrationForm = () => {
           </div>
         )}
 
-        <div className="fixed top-6 right-6 z-50">
+        {/* Theme Toggle - MOVED TO BOTTOM RIGHT */}
+        <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={() => setIsDark(!isDark)}
             className="group relative w-16 h-16 rounded-full bg-gradient-to-r from-green-400 to-green-500 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 active:scale-95"
@@ -225,7 +223,7 @@ const RegistrationForm = () => {
               Team Registration
             </h1>
             <p className={`${themeClasses.textMuted} text-lg animate-slide-up`} style={{ animationDelay: "0.2s" }}>
-              Register for September Sprint
+              Register for Hungama
             </p>
             <div className="w-24 h-1 bg-gradient-to-r from-green-400 to-green-500 mx-auto mt-4 rounded-full animate-slide-up" style={{ animationDelay: "0.4s" }}></div>
           </div>
@@ -278,7 +276,7 @@ const RegistrationForm = () => {
                   Team Members
                 </h2>
                 <div className={`px-4 py-2 ${themeClasses.memberCard} rounded-full border ${themeClasses.textMuted} text-sm font-medium`}>
-                  {teamData.members.length}/4 members
+                  {teamData.members.length}/2 members
                 </div>
               </div>
 
@@ -303,7 +301,7 @@ const RegistrationForm = () => {
                         </>
                       )}
                     </h3>
-                    {!member.isLeader && teamData.members.length > 2 && (
+                    {!member.isLeader && (
                       <button
                         type="button"
                         onClick={() => removeMember(index)}
@@ -385,7 +383,7 @@ const RegistrationForm = () => {
                 </div>
               ))}
 
-              {teamData.members.length < 4 && (
+              {teamData.members.length < 2 && (
                 <button
                   type="button"
                   onClick={addMember}

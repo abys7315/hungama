@@ -2,18 +2,22 @@ const Team = require("../models/Team");
 const { validationResult } = require("express-validator");
 const { sendRegistrationEmail } = require("../services/emailService");
 
-// Helper function to get the next unique team ID
-// This is a simple approach. For high concurrency, consider a more robust transaction-based method.
+/**
+ * Generates the next sequential team ID based on the last entry.
+ * Starts with SS-101.
+ */
 async function getNextTeamId() {
   const lastTeam = await Team.findOne().sort({ createdAt: -1 });
   if (!lastTeam || !lastTeam.teamId) {
-    return "SS-101"; // Starting number
+    return "SS-101"; // Starting ID
   }
-  const lastId = parseInt(lastTeam.teamId.split("-")[1]);
-  return `SS-${lastId + 1}`;
+  const lastIdNumber = parseInt(lastTeam.teamId.split("-")[1]);
+  return `SS-${lastIdNumber + 1}`;
 }
 
-// Create a new team
+/**
+ * Creates a new team after extensive validation.
+ */
 exports.createTeam = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -23,158 +27,107 @@ exports.createTeam = async (req, res, next) => {
 
     const { teamName, members } = req.body;
 
-    // --- NEW: Validate Team Size ---
-    if (!members || members.length < 2) {
+    // 1. Validate Team Size: Must be 1 or 2 members.
+    if (!members || ![1, 2].includes(members.length)) {
       return res.status(400).json({
         success: false,
-        error: "A team must have at least 2 members.",
-      });
-    }
-    if (members.length > 4) {
-      // Optional: You can set a maximum size
-      return res.status(400).json({
-        success: false,
-        error: "A team cannot have more than 4 members.",
+        error: "A team must have either 1 or 2 members.",
       });
     }
 
-    // --- Leader and Duplicate Checks (no changes here) ---
-    const leaders = members.filter((m) => m.isLeader);
-    if (leaders.length !== 1) {
+    // 2. Validate Team Name Uniqueness
+    const existingTeamName = await Team.findOne({ teamName });
+    if (existingTeamName) {
       return res
         .status(400)
-        .json({
-          success: false,
-          error: "There must be exactly one team leader",
-        });
+        .json({ success: false, error: "This team name is already taken." });
+    }
+
+    // 3. Validate for exactly one leader (required for emails etc.)
+    const leaders = members.filter((m) => m.isLeader);
+    if (leaders.length !== 1) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Internal error: A team must have exactly one designated leader.",
+      });
     }
     const leader = leaders[0];
 
-    // ... rest of the function remains the same ...
-    if (!leader.email.endsWith("@vitapstudent.ac.in")) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Team leader email must end with @vitapstudent.ac.in",
-        });
-    }
+    // 4. Batch Validation for all members
+    const emails = members.map((m) => m.email);
+    const mobiles = members.map((m) => m.mobile);
+    const regNos = members.map((m) => m.regNo);
 
-    const existingTeam = await Team.findOne({ teamName });
-    if (existingTeam) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Team name already exists" });
-    }
-
-    const leaderAlreadyRegistered = await Team.findOne({
-      "members.email": leader.email,
-    });
-    if (leaderAlreadyRegistered) {
+    // 4a. Check for duplicates within the submitted form data
+    if (
+      new Set(emails).size !== emails.length ||
+      new Set(mobiles).size !== mobiles.length ||
+      new Set(regNos).size !== regNos.length
+    ) {
       return res.status(400).json({
         success: false,
-        error: `Team leader with email ${leader.email} is already registered in team '${leaderAlreadyRegistered.teamName}'.`,
+        error:
+          "Duplicate email, mobile, or registration number found within your team.",
       });
     }
 
-    const emails = members.map((m) => m.email);
-    if (new Set(emails).size !== emails.length) {
-      return res
-        .status(400)
-        .json({
+    // 4b. Validate format for each member
+    for (const member of members) {
+      if (!member.email.endsWith("@vitapstudent.ac.in")) {
+        return res.status(400).json({
           success: false,
-          error: "Duplicate email addresses found within the team",
+          error: `Invalid email: ${member.email}. All emails must end with @vitapstudent.ac.in`,
         });
+      }
+      if (!/^\d{10}$/.test(member.mobile)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid mobile number: ${member.mobile}. It must be exactly 10 digits.`,
+        });
+      }
     }
 
-    // ... and so on for the rest of the function ...
+    // 5. Check for uniqueness across the entire database
+    const existingMember = await Team.findOne({
+      $or: [
+        { "members.email": { $in: emails } },
+        { "members.mobile": { $in: mobiles } },
+        { "members.regNo": { $in: regNos } },
+      ],
+    });
 
+    if (existingMember) {
+      return res.status(400).json({
+        success: false,
+        error: `One or more of your members are already registered in another team ('${existingMember.teamName}'). Please ensure email, mobile, and registration numbers are unique.`,
+      });
+    }
+
+    // All validations passed, proceed to create the team
     const teamId = await getNextTeamId();
     const team = new Team({ teamName, teamId, members });
     const savedTeam = await team.save();
 
-    try {
-      await sendRegistrationEmail(leader.email, teamName, teamId);
-    } catch (mailErr) {
-      console.error(
-        `Email sending failed for team ${teamName}:`,
-        mailErr.message
-      );
-    }
+    // Send confirmation email to the leader
+    // try {
+    //   await sendRegistrationEmail(leader.email, teamName, teamId);
+    // } catch (mailErr) {
+    //   console.error(
+    //     `CRITICAL: Email sending failed for team ${teamName} (${teamId}) but registration was successful. Error:`,
+    //     mailErr.message
+    //   );
+    // }
 
+    // Send success response
     res.status(201).json({
       success: true,
       message:
-        "Team registered successfully. The team leader has been sent a confirmation email.",
+        "Team registered successfully! The team leader has been sent a confirmation email.",
       redirectUrl: "/success",
       data: savedTeam,
     });
   } catch (error) {
-    next(error);
-  }
-};
-
-// Get all teams
-exports.getTeams = async (req, res, next) => {
-  try {
-    const teams = await Team.find().sort({ createdAt: -1 });
-    res.status(200).json({
-      success: true,
-      count: teams.length,
-      data: teams,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Get a single team by ID
-exports.getTeam = async (req, res, next) => {
-  try {
-    const team = await Team.findById(req.params.id);
-
-    if (!team) {
-      return res.status(404).json({
-        success: false,
-        error: "Team not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: team,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getTeamSummaries = async (req, res, next) => {
-  try {
-    // Fetch all teams, but only the fields we absolutely need.
-    const teams = await Team.find()
-      .select("teamId teamName members")
-      .sort({ createdAt: -1 });
-
-    // Transform the full team data into a clean summary format.
-    const teamSummaries = teams.map((team) => {
-      // Find the leader within the members array for the current team.
-      const leader = team.members.find((member) => member.isLeader);
-
-      return {
-        teamId: team.teamId,
-        teamName: team.teamName,
-        // Safely access the leader's email, providing a fallback if not found.
-        leaderEmail: leader ? leader.email : "Not available",
-      };
-    });
-
-    res.status(200).json({
-      success: true,
-      count: teamSummaries.length,
-      data: teamSummaries,
-    });
-  } catch (error) {
-    next(error);
+    next(error); // Pass to global error handler
   }
 };

@@ -20,14 +20,14 @@ async function sendRegistrationEmail(toEmail, teamName, teamId) {
     const whatsappLink = process.env.WHATSAPP_GROUP_LINK;
 
     const mailOptions = {
-        from: `"September Sprint" <${process.env.EMAIL_USER}>`,
+        from: `"Hungama" <${process.env.EMAIL_USER}>`,
         to: toEmail,
-        subject: `✅ Registration Confirmed for ${teamName} - September Sprint`,
+        subject: `✅ Registration Confirmed for ${teamName} - Hungama`,
         html: `
             <div style="font-family: Arial, sans-serif; color: #333;">
                 <h2>🎉 Congratulations! Your Registration is Confirmed! 🎉</h2>
                 <p>Hello,</p>
-                <p>Your team, <strong>${teamName}</strong>, has been successfully registered for the <b>September Sprint</b> event.</p>
+                <p>Your team, <strong>${teamName}</strong>, has been successfully registered for the <b> Hungama </b> event.</p>
                 <p>Your official Team ID is: <strong style="font-size: 1.2em; color: #0056b3;">${teamId}</strong>. Please use this for all future correspondence.</p>
                 <p>To receive important announcements and coordinate with organizers, please join our official WhatsApp group:</p>
                 <p style="text-align: center;">
@@ -38,7 +38,7 @@ async function sendRegistrationEmail(toEmail, teamName, teamId) {
                 <p>We are excited to see what you build. Stay tuned for more details!</p>
                 <br/>
                 <p>Best regards,</p>
-                <p><strong>The Organizing Committee</strong></p>
+                <p><strong>Milestone Club</strong></p>
             </div>
         `
     };

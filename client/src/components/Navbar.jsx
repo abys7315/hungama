@@ -35,7 +35,7 @@ const Navbar = () => {
                 <Code className="w-6 h-6 text-slate-900" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                Android Club VIT-AP
+                Milestone Club VIT-AP
               </span>
             </div>
           </Link>
@@ -43,23 +43,11 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8 text-[#7ab00e]">
             <Link
-              to="/"
+              to="/event"
               className="hover:text-emerald-400 transition-colors duration-200 font-medium"
             >
-              Home
+              About Event
             </Link>
-            <Link
-              to="/register"
-              className="hover:text-emerald-400 transition-colors duration-200 font-medium"
-            >
-              Events
-            </Link>
-            <a
-              href="https://d2ec9l5n40oyrl.cloudfront.net/"
-              className="hover:text-emerald-400 transition-colors duration-200 font-medium"
-            >
-              Community
-            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -80,27 +68,13 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-slate-900/95 backdrop-blur-md border-t border-slate-800 text-[#7ab00e]">
           <div className="px-4 py-4 space-y-3">
-            <a
-              href="#home"
+            <Link
+              to="/register"
               className="block py-2 hover:text-emerald-400 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Home
-            </a>
-            <a
-              href="#events"
-              className="block py-2 hover:text-emerald-400 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Events
-            </a>
-            <a
-              href="#community"
-              className="block py-2 hover:text-emerald-400 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Community
-            </a>
+              About Event
+            </Link>
           </div>
         </div>
       )}
