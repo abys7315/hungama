@@ -5,7 +5,7 @@ exports.validateTeam = [
     .trim()
     .notEmpty()
     .withMessage('Team name is required')
-    .isLength({ min: 3 })
+    .isLength({ min: 1 })
     .withMessage('Team name must be at least 3 characters long'),
   
   body('members')
