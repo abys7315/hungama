@@ -10,7 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Your CORS configuration is well-defined and secure.
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = [
+  'http://localhost:5173', // Development
+  process.env.FRONTEND_URL // Production
+].filter(Boolean); // Remove undefined values
+
 const corsOptions = {
   origin: (origin, callback) => {
     // Allows requests from your frontend's origin and tools like Postman
