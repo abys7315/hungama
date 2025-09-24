@@ -5,7 +5,7 @@ const connectionOptions = {
   useUnifiedTopology: true,
 };
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/registration_db';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const connectDB = async () => {
   try {
