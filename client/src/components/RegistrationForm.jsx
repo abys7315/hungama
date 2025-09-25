@@ -103,7 +103,7 @@ const RegistrationForm = () => {
       return false;
     }
     const leader = teamData.members.find((m) => m.isLeader);
-    if (!leader || !leader.email.endsWith("@vitapstudent.ac.in")) {
+    if (!leader || !leader.email.endsWith("use college id")) {
       setError("Team leader email must end with @vitapstudent.ac.in");
       return false;
     }
@@ -385,7 +385,7 @@ const RegistrationForm = () => {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span className="text-sm sm:text-base">Registering Team...</span>
+                      <span className="text-sm sm:text-base">Registering Team...It may take a min.</span>
                     </>
                   ) : (
                     "Register Team"
