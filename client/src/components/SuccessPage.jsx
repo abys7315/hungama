@@ -80,7 +80,7 @@ const SuccessPage = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-800 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-300"></div>
                 <span className="relative flex items-center gap-3">
-                  Join WhatsApp Group
+                  Join The Club
                 </span>
               </a>
             </div>
