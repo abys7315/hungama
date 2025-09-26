@@ -55,7 +55,7 @@ const App = () => {
     backgroundImageUrl: "https://i.postimg.cc/pVDL6c4r/hungama-background.jpg",
     date: "September 27, 2025",
     time: "2:00 PM - 6:00 PM",
-    venue: "Yet to be announced!!",
+    venue: "AB-2 214",
     description:
       "Milestone Club is thrilled to present 'Hungama,' a thrilling treasure hunt designed for the brave and the bold. Join us for a day of cryptic riddles, campus-wide challenges, and adrenaline-pumping rounds. It's the perfect opportunity to test your wits, work as a team, and claim the ultimate prize!",
     agenda: [
