@@ -8,6 +8,7 @@ import {
   User,
   Hash,
 } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 // --- Static Background Image Component ---
 const StaticBackgroundImage = ({ imageUrl, theme }) => {
@@ -51,6 +52,7 @@ const RegistrationForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   
   const backgroundImageUrl = "https://i.postimg.cc/pVDL6c4r/hungama-background.jpg";
@@ -126,6 +128,10 @@ const RegistrationForm = () => {
         return false;
       }
     }
+    if (!captchaToken) {
+      setError("Please complete the CAPTCHA verification");
+      return false;
+    }
     return true;
   };
 
@@ -143,7 +149,7 @@ const RegistrationForm = () => {
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(teamData),
+        body: JSON.stringify({ ...teamData, captchaToken }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -161,6 +167,7 @@ const RegistrationForm = () => {
           { fullName: "", email: "", mobile: "", regNo: "", isLeader: true },
         ],
       });
+      setCaptchaToken(null);
     } catch (err) {
       setError(err.message || "An unexpected error occurred.");
     }
@@ -369,6 +376,13 @@ const RegistrationForm = () => {
                   <span className="font-medium text-sm sm:text-base">Add Team Member</span>
                 </button>
               )}
+            </div>
+
+            <div className="mb-6 animate-slide-up" style={{ animationDelay: "1.8s" }}>
+              <ReCAPTCHA
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "your-site-key-here"}
+                onChange={setCaptchaToken}
+              />
             </div>
 
             <div

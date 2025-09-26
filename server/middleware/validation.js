@@ -29,5 +29,9 @@ exports.validateTeam = [
   body('members.*.regNo')
     .trim()
     .notEmpty()
-    .withMessage('Registration number is required for all members')
+    .withMessage('Registration number is required for all members'),
+
+  body('captchaToken')
+    .notEmpty()
+    .withMessage('CAPTCHA verification is required')
 ];

@@ -25,7 +25,38 @@ exports.createTeam = async (req, res, next) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { teamName, members } = req.body;
+    const { teamName, members, captchaToken } = req.body;
+
+    // Verify reCAPTCHA
+    if (!captchaToken) {
+      return res.status(400).json({
+        success: false,
+        error: "CAPTCHA verification is required",
+      });
+    }
+
+    const secret = process.env.RECAPTCHA_SECRET_KEY;
+    if (!secret) {
+      console.error("RECAPTCHA_SECRET_KEY is not set in environment variables");
+      return res.status(500).json({
+        success: false,
+        error: "Server configuration error",
+      });
+    }
+
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${captchaToken}`;
+    const verifyResponse = await fetch(verifyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+    const verifyData = await verifyResponse.json();
+
+    if (!verifyData.success) {
+      return res.status(400).json({
+        success: false,
+        error: "CAPTCHA verification failed. Please try again.",
+      });
+    }
 
     // 1. Validate Team Size: Must be 1 or 2 members.
     if (!members || ![1, 2].includes(members.length)) {
