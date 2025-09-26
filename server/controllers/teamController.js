@@ -1,6 +1,5 @@
 const Team = require("../models/Team");
 const { validationResult } = require("express-validator");
-const { sendRegistrationEmail } = require("../services/emailService");
 
 /**
  * Generates the next sequential team ID based on the last entry.
@@ -74,7 +73,7 @@ exports.createTeam = async (req, res, next) => {
         .json({ success: false, error: "This team name is already taken." });
     }
 
-    // 3. Validate for exactly one leader (required for emails etc.)
+    // 3. Validate for exactly one leader
     const leaders = members.filter((m) => m.isLeader);
     if (leaders.length !== 1) {
       return res.status(400).json({
@@ -83,7 +82,6 @@ exports.createTeam = async (req, res, next) => {
           "Internal error: A team must have exactly one designated leader.",
       });
     }
-    const leader = leaders[0];
 
     // 4. Batch Validation for all members
     const emails = members.map((m) => m.email);
@@ -140,21 +138,10 @@ exports.createTeam = async (req, res, next) => {
     const team = new Team({ teamName, teamId, members });
     const savedTeam = await team.save();
 
-    // Send confirmation email to the leader
-    try {
-      await sendRegistrationEmail(leader.email, teamName, teamId);
-    } catch (mailErr) {
-      console.error(
-        `CRITICAL: Email sending failed for team ${teamName} (${teamId}) but registration was successful. Error:`,
-        mailErr.message
-      );
-    }
-
     // Send success response
     res.status(201).json({
       success: true,
-      message:
-        "Team registered successfully! The team leader has been sent a confirmation email.",
+      message: "Team registered successfully!",
       redirectUrl: "/success",
       data: savedTeam,
     });
