@@ -141,14 +141,14 @@ exports.createTeam = async (req, res, next) => {
     const savedTeam = await team.save();
 
     // Send confirmation email to the leader
-    // try {
-    //   await sendRegistrationEmail(leader.email, teamName, teamId);
-    // } catch (mailErr) {
-    //   console.error(
-    //     `CRITICAL: Email sending failed for team ${teamName} (${teamId}) but registration was successful. Error:`,
-    //     mailErr.message
-    //   );
-    // }
+    try {
+      await sendRegistrationEmail(leader.email, teamName, teamId);
+    } catch (mailErr) {
+      console.error(
+        `CRITICAL: Email sending failed for team ${teamName} (${teamId}) but registration was successful. Error:`,
+        mailErr.message
+      );
+    }
 
     // Send success response
     res.status(201).json({

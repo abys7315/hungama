@@ -1,49 +1,52 @@
-// services/emailService.js
-require('dotenv').config();
 const nodemailer = require('nodemailer');
 
+// Create transporter using Gmail SMTP
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS // Use an App Password for Gmail
-    }
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 /**
  * Sends a registration confirmation email to the team leader.
- * @param {string} toEmail - The recipient's email address.
+ * @param {string} toEmail - The email address of the team leader.
  * @param {string} teamName - The name of the registered team.
- * @param {string} teamId - The unique ID assigned to the team.
+ * @param {string} teamId - The unique ID of the registered team.
  */
 async function sendRegistrationEmail(toEmail, teamName, teamId) {
-    const whatsappLink = process.env.WHATSAPP_GROUP_LINK;
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: toEmail,
+    subject: 'Team Registration Confirmation - Hungama',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <h2 style="color: #333; text-align: center;">Welcome to Hungama!</h2>
+        <p>Dear Team Leader,</p>
+        <p>Congratulations! Your team <strong>${teamName}</strong> has been successfully registered for the Hungama event.</p>
+        <p><strong>Team ID:</strong> ${teamId}</p>
+        <p><strong>Venue:</strong> AB-2 Room No. 214</p>
+        <p><strong>Time:</strong> 01:45 PM</p>
+        <p>Please keep this email for your records. If you have any questions, feel free to contact us.</p>
+        <p>Best regards,<br>Milestone club</p>
+        <hr style="border: none; border-top: 1px solid #eee;">
+        <p style="font-size: 12px; color: #666; text-align: center;">This is an automated email. Please do not reply.</p>
+      </div>
+    `,
+  };
 
-    const mailOptions = {
-        from: `"Hungama" <${process.env.EMAIL_USER}>`,
-        to: toEmail,
-        subject: `✅ Registration Confirmed for ${teamName} - Hungama`,
-        html: `
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h2>🎉 Congratulations! Your Registration is Confirmed! 🎉</h2>
-                <p>Hello,</p>
-                <p>Your team, <strong>${teamName}</strong>, has been successfully registered for the <b> Hungama </b> event.</p>
-                <p>Your official Team ID is: <strong style="font-size: 1.2em; color: #0056b3;">${teamId}</strong>. Please use this for all future correspondence.</p>
-                <p>To receive important announcements and coordinate with organizers, please join our official WhatsApp group:</p>
-                <p style="text-align: center;">
-                    <a href="${whatsappLink}" style="background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                        Join WhatsApp Group
-                    </a>
-                </p>
-                <p>We are excited to see what you build. Stay tuned for more details!</p>
-                <br/>
-                <p>Best regards,</p>
-                <p><strong>Milestone Club</strong></p>
-            </div>
-        `
-    };
-    await transporter.sendMail(mailOptions);
-    console.log(`Confirmation email sent to ${toEmail} for team ${teamName}.`);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Registration email sent:', info.messageId);
+  } catch (error) {
+    console.error('Error sending registration email:', error);
+    throw error; // Re-throw to allow caller to handle
+  }
 }
 
-module.exports = { sendRegistrationEmail };
+module.exports = {
+  sendRegistrationEmail,
+};
