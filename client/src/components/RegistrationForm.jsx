@@ -232,18 +232,6 @@ const RegistrationForm = () => {
             style={{ animationDelay: "0.6s" }}
             noValidate
           >
-            {error && (
-              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-500/10 border border-red-500/30 rounded-xl sm:rounded-2xl text-red-400 text-sm sm:text-base animate-shake">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-500/10 border border-green-500/30 rounded-xl sm:rounded-2xl text-green-400 text-sm sm:text-base">
-                {success}
-              </div>
-            )}
-
             <div className="mb-8 sm:mb-10 animate-slide-up" style={{ animationDelay: "0.8s" }}>
               <label className={`block ${themeClasses.text} font-semibold mb-3 text-base sm:text-lg`}>
                 Team Name *
@@ -379,11 +367,31 @@ const RegistrationForm = () => {
             </div>
 
             <div className="mb-6 animate-slide-up" style={{ animationDelay: "1.8s" }}>
-              <ReCAPTCHA
-                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "your-site-key-here"}
-                onChange={setCaptchaToken}
-              />
+              <div className={`${themeClasses.card} p-4 rounded-xl border ${themeClasses.borderColor}`}>
+                <label className={`block ${themeClasses.textSecondary} text-sm font-medium mb-3 text-center`}>
+                  Verify you are human *
+                </label>
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || "your-site-key-here"}
+                    onChange={setCaptchaToken}
+                    theme="dark"
+                  />
+                </div>
+              </div>
             </div>
+
+            {error && (
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-500/10 border border-red-500/30 rounded-xl sm:rounded-2xl text-red-400 text-sm sm:text-base animate-shake">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-500/10 border border-green-500/30 rounded-xl sm:rounded-2xl text-green-400 text-sm sm:text-base">
+                {success}
+              </div>
+            )}
 
             <div
               className={`mt-8 sm:mt-10 pt-6 sm:pt-8 border-t ${themeClasses.borderColor} animate-slide-up`}
